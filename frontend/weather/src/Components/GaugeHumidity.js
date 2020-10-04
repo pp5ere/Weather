@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 //import am4themes_animated from "@amcharts/amcharts4/themes/animated";
-import {getDataFromSensor } from '../API/weather'
 
 /* Chart code */
 // Themes begin
@@ -107,9 +106,8 @@ class GaugeHumidity extends Component{
             axis2.invalidate();
         });
 
-        setInterval(async() =>{
-            let temp = await getDataFromSensor();
-            let value = temp.Hum;
+        setInterval(() =>{            
+            let value = this.props.iotdata.Hum;
             new am4core.Animation(hand, {
                 property: "value",
                 to: value
