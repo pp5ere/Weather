@@ -32,8 +32,8 @@ export default class GaugesContainer extends Component{
     render(){
         return (                               
             <div className="chartGauge"> 
-                <GaugeHumidity iotdata={this.state}/>
                 <GaugeTemperature iotdata={this.state}/>
+                <GaugeHumidity iotdata={this.state}/>
                 <GaugePressure iotdata={this.state}/>
             </div>                                           
         );
