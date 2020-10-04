@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-const DOMAIN = "http://pp5ere.sytes.net";
-const HOST = DOMAIN + ":9000";
-
+/*const DOMAIN = "http://pp5ere.sytes.net";
+const HOST = DOMAIN + ":9000";*/
+const HOST = window.location.protocol + "//" + window.location.hostname + ":9000";
 const dateToString = d => `${ d.getFullYear() }-${('00' + (d.getMonth() + 1)).slice(-2)}-${('00' + d.getDate()).slice(-2)}`;
 
 const getWeatherByDate = async (date) =>{
