@@ -3,14 +3,12 @@ import ChartTemperature from './ChartTemperature';
 import ChartHum from './ChartHum';
 import ChartPres from './ChartPres';
 import ChartMaxMin from './ChartMaxMin';
-import GaugeTemperature from './GaugeTemperature';
 import { getWeatherByDate, getMaxMinTempCPerDay} from '../API/weather'
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import GaugeHumidity from './GaugeHumidity';
-import GaugePressure from './GaugePressure';
+import GaugesContainer from './GaugeContainer';
 
-export default class Buttons extends Component{
+export default class ChartContainer extends Component{
     constructor (props){
         super(props);
         this.state = {
@@ -84,12 +82,8 @@ export default class Buttons extends Component{
                         </div>                        
                     </div>
                     
-                    <div>
-                        <div className="chartGauge"> 
-                            <GaugeHumidity/>
-                            <GaugeTemperature/>
-                            <GaugePressure/>
-                        </div>
+                    <div>                        
+                        <GaugesContainer/>                                                    
                         <ChartTemperature weather={this.state.weather}/>
                         <div className="chartContainer"> 
                             <ChartHum weather={this.state.weather}/>
