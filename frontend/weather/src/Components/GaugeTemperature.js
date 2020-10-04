@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import * as am4core from "@amcharts/amcharts4/core";
 import * as am4charts from "@amcharts/amcharts4/charts";
 //import am4themes_animated from "@amcharts/amcharts4/themes/animated";
-import {getDataFromSensor } from '../API/weather'
 
 /* Chart code */
 // Themes begin
@@ -13,14 +12,15 @@ class GaugeTemperature extends Component{
     componentDidMount() {  
         this.Gauge();
     }
-    Gauge(){
+    Gauge(){        
         // create chart
+    
         let chart = am4core.create("GaugeTemp", am4charts.GaugeChart);
         chart.innerRadius = am4core.percent(82);
 
-        /**
-         * Normal axis
-         */
+        
+         //Normal axis
+        
         let axis = chart.xAxes.push(new am4charts.ValueAxis());
         axis.min = -20;
         axis.max = 50;
@@ -42,9 +42,9 @@ class GaugeTemperature extends Component{
         });
 
 
-        /**
-         * Axis for ranges
-         */
+        
+        //Axis for ranges
+         
 
         let colorSet = new am4core.ColorSet();
 
@@ -68,9 +68,7 @@ class GaugeTemperature extends Component{
         range1.axisFill.fillOpacity = 1;
         range1.axisFill.fill = colorSet.getIndex(6);
 
-        /**
-         * Label
-         */
+        //Label
 
         let label = chart.radarContainer.createChild(am4core.Label);
         label.isMeasured = false;
@@ -91,9 +89,9 @@ class GaugeTemperature extends Component{
         labelText.text = "C°";
 
 
-        /**
-         * Hand
-         */
+        
+        //Hand
+         
 
         let hand = chart.hands.push(new am4charts.ClockHand());
         hand.axis = axis2;
@@ -109,9 +107,8 @@ class GaugeTemperature extends Component{
             axis2.invalidate();
         });
 
-        setInterval(async() =>{
-            let temp = await getDataFromSensor();
-            let value = temp.TempC;
+        setInterval(() =>{
+            let value = this.props.iotdata.TempC;            
             new am4core.Animation(hand, {
                 property: "value",
                 to: value
@@ -126,10 +123,17 @@ class GaugeTemperature extends Component{
     
     render() {  
         return (  
-            <div id="GaugeTemp" className="gauge"></div>
+            <div id="GaugeTemp" className="gauge"/>
         )  
     }  
 
 }
+/*
+    render() {  
+        return (  
+            <h2>It is {this.props.iotdata.TempC}.</h2>
+        )  
+    }  
+}*/
 
 export default GaugeTemperature;
