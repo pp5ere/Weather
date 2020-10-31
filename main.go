@@ -36,7 +36,8 @@ func startGorillaMux(){
 			log.WriteLog(err.Error());if err != nil {
 				fmt.Println("Error to write log: "+err.Error())
 			}
-		}else{				
+		}else{		
+			repo.CreateTable("weather")		
 			controllers := controller.New(repo)
 			r := usecase.Initialize(controllers)
 			err := http.ListenAndServe(c.APIHost + c.APIPort, r);if err != nil {
