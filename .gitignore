@@ -1,2 +1,2 @@
-./data/*
-./logfile/*
+/data
+/logfile
