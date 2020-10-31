@@ -18,66 +18,14 @@
             if (oldProps.weather !== this.props.weather){
                 this.chart.data = this.props.weather;
             }
-           /* this.chart.dataSource.load();
-            this.chart.dataSource.events.on("done", function(ev) {
-                // Data loaded and parsed
-                //console.log(ev.target.data.Weather);
-                let weatherArray = ev.target.data.Weather;
-                if (weatherArray != null){
-                weatherArray.forEach((item)=> {
-                    item.Data = new Date(item.Data);
-                });
-                this.chart.data =weatherArray;
-                console.log(weatherArray);
-            } 
-            });*/
-            //console.log(this.props.weather);
-            /*if (oldProps.date !== this.props.date){
-                this.chart.dataSource.url = "http://pp5ere.sytes.net:9000/weather/" +  dateToString(this.props.date);
-                console.log(this.chart.dataSource.url);
-                this.chart.dataSource.load();
-                if (this.props.date.toISOString().slice(0,10)  === new Date().toISOString().slice(0,10)){
-                    this.chart.dataSource.incremental = true;
-                    this.chart.dataSource.reloadFrequency = 60000;
-                }else {
-                    this.chart.dataSource.incremental = false;
-                    this.chart.dataSource.reloadFrequency = 0;
-                }
-            }*/
         }
 
         Chart(weather,unit){
             let chart = am4core.create("TempChart", am4charts.XYChart);  
-            //let dataSource = new am4core.DataSource();
             chart.language.locale = am4lang_pt_BR;
-            //this.loadData(chart);
             
             // Add data  
-            chart.data = weather;
-                        
-            //chart.data = chart.data.Weather;
-            /*chart.dataSource.url = "http://pp5ere.sytes.net:9000/weather/" + dateToString(this.props.date);
-            chart.dataSource.parser = am4core.JSONParser;
-            chart.dataSource.load();
-            chart.dataSource.events.on("done", function(ev) {
-                // Data loaded and parsed
-                console.log(ev.target.data.Weather);
-            });
-            chart.dataSource.load();
-            chart.dataSource.events.on("done", function(ev) {
-                // Data loaded and parsed
-                //console.log(ev.target.data.Weather);
-                let weatherArray = ev.target.data.Weather;
-                if (weatherArray != null){
-                weatherArray.forEach((item)=> {
-                    item.Data = new Date(item.Data);
-                });
-                chart.data =weatherArray;
-            } 
-            });
-            
-            chart.dataSource.incremental = true;
-            chart.dataSource.reloadFrequency = 60000;*/
+            chart.data = weather;                    
             
             let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
             
@@ -162,26 +110,7 @@
                 this.chart.dispose(); 
                 delete this.chart; 
             }  
-        }  
-
-        /*loadData(chart){
-            chart.dataSource.url = "http://pp5ere.sytes.net:9000/weather/" + dateToString(this.props.date);            
-            chart.dataSource.load();
-            chart.dataSource.events.on("done", function(ev) {
-                // Data loaded and parsed
-                let weatherArray = ev.target.data.Weather;
-                if (weatherArray != null){
-                weatherArray.forEach((item)=> {
-                    item.Data = new Date(item.Data);
-                });
-                chart.data =weatherArray;
-            } 
-            });
-            
-            
-            chart.dataSource.incremental = true;
-            chart.dataSource.reloadFrequency = 60000;
-        }*/
+        } 
       
 
         render() {  
