@@ -1,6 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
+/logfile
+/data
 /frontend/weather/node_modules
 /.pnp
 .pnp.js
@@ -21,6 +23,3 @@
 /frontend/weather/npm-debug.log*
 /frontend/weather/yarn-debug.log*
 /frontend/weather/yarn-error.log*
-
-/repository/log
-/data
