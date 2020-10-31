@@ -18,7 +18,7 @@ type Weather interface{
 	FindMaxMinTempCPerDay(d time.Time) ([]*entity.WeatherMaxMin, error)
 }
 
-//Insert inserts a new weather
+//Insert add a new weather into db
 func (c *SqliteDB) Insert(w *entity.Weather) error {
 	connection := c.connection
 	addColumnIfNotExist("hi", c, updateHeatIndex)
@@ -31,7 +31,7 @@ func (c *SqliteDB) Insert(w *entity.Weather) error {
 	id, err := res.LastInsertId();if err != nil {
 		return err
 	}
-	return insertLog(id, w)
+	return insertLog(id, w, dp, hiC)
 }
 
 //FindAll returns all Weather from database order by ID
@@ -89,7 +89,7 @@ func (c *SqliteDB) FindMaxMinTempCPerDay(d time.Time) ([]*entity.WeatherMaxMin, 
 	return weathers, err
 }
 
-func insertLog(id int64, w *entity.Weather) error {
+func insertLog(id int64, w *entity.Weather, dp, hiC float64) error {
 	var msg string
 	msg = "Execute insert into weather: ID: " + strconv.FormatInt(id, 10) +
 			 " TempC = " + strconv.FormatFloat(w.TempC, 'f', 2, 64) + 
@@ -97,8 +97,8 @@ func insertLog(id int64, w *entity.Weather) error {
 			 " Hum: " + strconv.FormatFloat(w.Hum,'f',2,64) + 
 			 " Pres: " + strconv.FormatFloat(w.Pres,'f',2,64) + 
 			 " Alt: " + strconv.FormatFloat(w.Alt,'f',2,64)+
-			 " Hi: " + strconv.FormatFloat(w.Hi,'f',2,64)+
-			 " DewPoint: " + strconv.FormatFloat(w.DewPoint,'f',2,64)
+			 " Hi: " + strconv.FormatFloat(hiC,'f',2,64)+
+			 " DewPoint: " + strconv.FormatFloat(dp,'f',2,64)
 	return log.WriteLog(msg)
 }
 
@@ -176,4 +176,30 @@ func updateDewPoint(c *sql.Tx) error{
 		}
 	}
 	return err
+}
+//CreateTable create table weather if it not exist
+func (c *SqliteDB) CreateTable(dbName string) error {
+	var exist bool
+	connection := c.connection
+	err := connection.QueryRow(`SELECT EXISTS (SELECT * FROM sqlite_master WHERE tbl_name = ?)as exist`, dbName).Scan(&exist); if err != nil {
+		log.WriteLog(err.Error())
+		return err
+	}
+	if !exist{
+		_, err = connection.Exec(`CREATE TABLE weather (
+									id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+									data DATE NOT NULL,
+									tempc float NOT NULL,
+									tempf float NOT NULL,
+									Hum float NOT NULL,
+									Pres float NOT NULL,
+									Alt float NOT NULL, 
+									hi float, 
+									dewpoint float)`)
+		if err != nil {
+			return err
+		}
+	}
+	
+	return nil
 }
