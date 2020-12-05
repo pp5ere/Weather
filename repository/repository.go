@@ -84,7 +84,7 @@ func (c *SqliteDB) FindMaxMinTempCPerDay(d time.Time) ([]*entity.WeatherMaxMin, 
 
 func insertLog(id int64, w *entity.Weather) error {
 	var msg string
-	msg = "Execute insert into weather: ID: " + strconv.FormatInt(id, 10) +
+	msg = "Execute insert into weather: ID = " + strconv.FormatInt(id, 10) +
 			 " TempC = " + strconv.FormatFloat(w.TempC, 'f', 2, 64) + 
 			 " TempF = " + strconv.FormatFloat(w.TempF, 'f', 2, 64) + 
 			 " Hum = " + strconv.FormatFloat(w.Hum,'f',2,64) + 
