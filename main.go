@@ -37,13 +37,19 @@ func startGorillaMux(){
 				fmt.Println("Error to write log: "+err.Error())
 			}
 		}else{		
-			repo.CreateTable("weather")		
-			controllers := controller.New(repo)
-			r := usecase.Initialize(controllers)
-			err := http.ListenAndServe(c.APIHost + c.APIPort, r);if err != nil {
-				log.WriteLog(err.Error())
-				l.Fatal(err)
-			}    					
+			err := repo.CreateTable("weather"); if err != nil {			
+				log.WriteLog(err.Error());if err != nil {
+					fmt.Println("Error to write log: "+err.Error())
+				}
+				return
+			}else{
+				controllers := controller.New(repo)
+				r := usecase.Initialize(controllers)
+				err := http.ListenAndServe(c.APIHost + c.APIPort, r);if err != nil {
+					log.WriteLog(err.Error())
+					l.Fatal(err)
+				}
+			}
 		}
 	}
 }
@@ -69,10 +75,6 @@ func Execute()  {
 						fmt.Println("Error to write log: "+err.Error())
 					}			
 				}else{
-					hiC := util.FahrenheitToCelsius(util.CalculateHeatIndex(w.TempF, w.Hum))
-					dp := util.DewPoint(w.TempC,w.Hum)
-					w.Hi = hiC
-					w.DewPoint = dp
 					err := controllers.Weather.Insert(w);if err != nil {
 						log.WriteLog(err.Error());if err != nil {
 							fmt.Println("Error to write log: "+err.Error())
