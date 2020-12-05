@@ -69,6 +69,10 @@ func Execute()  {
 						fmt.Println("Error to write log: "+err.Error())
 					}			
 				}else{
+					hiC := util.FahrenheitToCelsius(util.CalculateHeatIndex(w.TempF, w.Hum))
+					dp := util.DewPoint(w.TempC,w.Hum)
+					w.Hi = hiC
+					w.DewPoint = dp
 					err := controllers.Weather.Insert(w);if err != nil {
 						log.WriteLog(err.Error());if err != nil {
 							fmt.Println("Error to write log: "+err.Error())
