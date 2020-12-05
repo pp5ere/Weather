@@ -3,6 +3,7 @@ package usecase
 import (
 	"Weather/entity"
 	"Weather/helper"
+	"Weather/middlewares/util"
 	"bytes"
 	"encoding/json"
 	"io"
@@ -33,6 +34,8 @@ func GetDataFromIoT() (*entity.Weather, error) {
 	err = json.Unmarshal(buf.Bytes(), &weather);if err != nil {
 		return nil, err
 	}
+	weather.Hi = util.FahrenheitToCelsius(util.CalculateHeatIndex(weather.TempF, weather.Hum))
+	weather.DewPoint = util.DewPoint(weather.TempC,weather.Hum)
 	defer resp.Body.Close()
 	return &weather,nil
 }
