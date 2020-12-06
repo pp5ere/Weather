@@ -41,7 +41,6 @@ func startGorillaMux(){
 				log.WriteLog(err.Error());if err != nil {
 					fmt.Println("Error to write log: "+err.Error())
 				}
-				return
 			}else{
 				controllers := controller.New(repo)
 				r := usecase.Initialize(controllers)
