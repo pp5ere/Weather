@@ -4,6 +4,8 @@ import 'react-calendar/dist/Calendar.css';
 import GaugeHumidity from './GaugeHumidity';
 import GaugePressure from './GaugePressure';
 import GaugeTemperature from './GaugeTemperature';
+import GaugeHi from './GaugeHi';
+import GaugeDewPoint from './GaugeDewPoint';
 
 export default class GaugesContainer extends Component{
     constructor(props) {
@@ -16,8 +18,7 @@ export default class GaugesContainer extends Component{
     componentDidMount() {
         this.getDataFromIot();        
         this.timerID = setInterval(
-            () => this.getDataFromIot(),
-            3000
+            () => this.getDataFromIot(), 3000
           );
     }
     
@@ -35,6 +36,8 @@ export default class GaugesContainer extends Component{
                 <GaugeTemperature iotdata={this.state}/>
                 <GaugeHumidity iotdata={this.state}/>
                 <GaugePressure iotdata={this.state}/>
+                <GaugeHi iotdata={this.state}/>
+                <GaugeDewPoint iotdata={this.state}/>
             </div>                                           
         );
     }
