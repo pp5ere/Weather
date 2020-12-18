@@ -70,7 +70,7 @@ func Execute()  {
 			}else{
 				controllers := controller.New(repo)
 				if ((w.TempC < -50) || (w.TempC == 23.39 && w.TempF == 74.1 && w.Hum == 30.03 && w.Pres == 618.94 )){
-					log.WriteLog(fmt.Sprintf("Invalid data values: TempC = %.2f TempF = %.2f Hum = %.2f Pres = %.2f",w.TempC, w.TempF, w.Hum, w.Pres));if err != nil {
+					log.WriteLog(fmt.Sprintf("Invalid data values: TempC = %.2f TempF = %.2f Hum = %.2f Pres = %.2f Alt = %2f Hi = %2f DewPoint = %2f",w.TempC, w.TempF, w.Hum, w.Pres, w.Alt, w.Hi, w.DewPoint));if err != nil {
 						fmt.Println("Error to write log: "+err.Error())
 					}			
 				}else{
