@@ -23,7 +23,14 @@
 
 .chartGauge{
     display: grid;
-    grid-template-columns: 33% 33% 33%;
+    grid-template-columns: 20% 20% 20% 20% 20%;
+}
+
+@media only screen and (max-width:1500px) {
+    /* For mobile phones: */
+    .chartGauge{
+        grid-template-columns: 33% 33% 33% ;
+    }
 }
 
 @media only screen and (max-width:920px) {
