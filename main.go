@@ -10,6 +10,7 @@ import (
 	"fmt"
 	l "log"
 	"net/http"
+	"regexp"
 	"sync"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -18,7 +19,8 @@ import (
 
 func main() {
 	go startGorillaMux()
-	log.WriteLog("Application started...")
+	go serveReact()
+	log.WriteLog("Back End Application started...")
 	Execute()
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
@@ -86,9 +88,30 @@ func Execute()  {
 	}
 }
 
+func serveReact() {
+	c, err := helper.LoadFromConfigFile();if err != nil {
+		l.Fatal(err)
+	}else{
+		log.WriteLog("Front End Application started...")
+		fileServer := http.FileServer(http.Dir(c.ReactAppFolder))
+		fileMatcher := regexp.MustCompile(`\.[a-zA-Z]*$`)
+		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			if !fileMatcher.MatchString(r.URL.Path) {
+				http.ServeFile(w, r, c.ReactAppFolder+"/index.html")
+			} else {
+				fileServer.ServeHTTP(w, r)
+			}
+		})
+		http.ListenAndServe(c.ReactAppPort, nil)
+	}
+}
+
 /*CROSSCOMPILE
+https://mtarnawa.org/2018/08/23/cross-compile-gorm-with-sqlite-for-raspberry-pi-arm7-and-odroid-arm64/
+install 
+sudo apt update && apt install gcc-arm-linux-gnueabihf
 compile to rapiberry pi:
-env GOOS=linux GOARCH=arm GOARM=5 go build
+GOOS=linux GOARCH=arm GOARM=7 CGO_ENABLED=1 CC=arm-linux-gnueabihf-gcc go build -o weather main.go
 compile to FreeBSD
 env GOOS=freebsd GOARCH=amd64 go build
 */
