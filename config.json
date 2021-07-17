@@ -1,7 +1,9 @@
 {
-    "URLFromIoTWebService": "http://192.168.1.35/weather", 
+    "URLFromIoTWebService": "http://192.168.3.50/weather", 
     "PathLog": "./logfile/log.txt",
     "PathSqliteDB": "./data/db.sqlite3",
     "APIPort": "9000",
-    "APIHost": ""
+    "APIHost": "",
+    "ReactAppFolder": "frontend/weather/build",
+    "ReactAppPort": "8000"
 }
