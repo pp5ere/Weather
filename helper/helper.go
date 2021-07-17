@@ -14,6 +14,8 @@ type Config struct{
 	PathSqliteDB string			`json:"PathSqliteDB"`
 	APIPort string				`json:"APIPort"`
 	APIHost string				`json:"APIHost"`
+	ReactAppFolder string		`json:"ReactAppFolder"`
+	ReactAppPort string			`json:"ReactAppPort"`
 }
 
 //LoadFromConfigFile loads json config file
