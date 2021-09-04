@@ -4,6 +4,5 @@
     "PathSqliteDB": "./data/db.sqlite3",
     "APIPort": "9000",
     "APIHost": "",
-    "ReactAppFolder": "frontend/weather/build",
-    "ReactAppPort": "8000"
+    "ReactAppFolder": "frontend/weather/build"
 }
