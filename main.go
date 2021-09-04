@@ -10,7 +10,6 @@ import (
 	"fmt"
 	l "log"
 	"net/http"
-	"regexp"
 	"sync"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -19,7 +18,6 @@ import (
 
 func main() {
 	go startGorillaMux()
-	go serveReact()
 	log.WriteLog("Back End Application started...")
 	Execute()
 	wg := &sync.WaitGroup{}
@@ -45,10 +43,13 @@ func startGorillaMux(){
 				}
 			}else{
 				controllers := controller.New(repo)
-				r := usecase.Initialize(controllers)
-				err := http.ListenAndServe(c.APIHost + c.APIPort, r);if err != nil {
+				r, err := usecase.Initialize(controllers); if err != nil {
 					log.WriteLog(err.Error())
-					l.Fatal(err)
+				}else{
+					err := http.ListenAndServe(c.APIHost + c.APIPort, r);if err != nil {
+						log.WriteLog(err.Error())
+						l.Fatal(err)
+					}
 				}
 			}
 		}
@@ -85,24 +86,6 @@ func Execute()  {
 				
 			}
 		}
-	}
-}
-
-func serveReact() {
-	c, err := helper.LoadFromConfigFile();if err != nil {
-		l.Fatal(err)
-	}else{
-		log.WriteLog("Front End Application started...")
-		fileServer := http.FileServer(http.Dir(c.ReactAppFolder))
-		fileMatcher := regexp.MustCompile(`\.[a-zA-Z]*$`)
-		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			if !fileMatcher.MatchString(r.URL.Path) {
-				http.ServeFile(w, r, c.ReactAppFolder+"/index.html")
-			} else {
-				fileServer.ServeHTTP(w, r)
-			}
-		})
-		http.ListenAndServe(c.ReactAppPort, nil)
 	}
 }
 
