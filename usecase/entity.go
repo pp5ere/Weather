@@ -10,6 +10,7 @@ import (
 type API struct{
 	Router *mux.Router
 	Weather controller.WeatherController
+	ReactAppFolder string
 }
 
 //ResultWeather show error json when its happening
