@@ -34,11 +34,14 @@ func startGorillaMux(){
 			log.WriteLog(err.Error())
 		}else{				
 			controllers := controller.New(repo)
-			r := usecase.Initialize(controllers)
-			err := http.ListenAndServe(c.APIHost + c.APIPort, r);if err != nil {
+			r, err := usecase.Initialize(controllers); if err != nil {
 				log.WriteLog(err.Error())
-				l.Fatal(err)
-			}    					
+			}else{
+				err := http.ListenAndServe(c.APIHost + c.APIPort, r);if err != nil {
+					log.WriteLog(err.Error())
+					l.Fatal(err)
+				}    
+			}					
 		}
 	}
 }
