@@ -24,6 +24,7 @@ func LoadFromConfigFile() (*Config, error) {
 	file, err := loadJSONFile(util.RootDir + "config.json");if err != nil {
 		return nil, err
 	}
+	defer file.Close()
 	jsonParser := json.NewDecoder(file)	
 	err = jsonParser.Decode(&c);if err != nil {
 		log.Fatal(err)
@@ -31,7 +32,7 @@ func LoadFromConfigFile() (*Config, error) {
 	c.PathLog = util.RootDir + c.PathLog
 	c.PathSqliteDB = util.RootDir + c.PathSqliteDB
 	c.APIPort = ":" + c.APIPort
-	file.Close()
+
 	return &c, nil
 }
 
