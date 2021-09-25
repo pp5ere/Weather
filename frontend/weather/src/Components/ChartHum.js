@@ -11,7 +11,7 @@
     export default class ChartHum extends Component {  
       
         componentDidMount() {  
-            this.Chart(this.props.weather, "HumChart", "%", "Hum", "Humidade", "#67b7dc");            
+            this.Chart(this.props.weather, "HumChart", "%", "Hum", "Umidade", "#67b7dc");            
         }  
 
         componentDidUpdate(oldProps){            

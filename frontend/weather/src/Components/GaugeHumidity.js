@@ -23,7 +23,7 @@ class GaugeHumidity extends Component{
         let axis = chart.xAxes.push(new am4charts.ValueAxis());
         axis.min = 0;
         axis.max = 100;
-        axis.title.text = "Humidade";
+        axis.title.text = "Umidade";
         axis.title.horizontalCenter = "middle";
         axis.strictMinMax = true;
         axis.fontSize = 12;
