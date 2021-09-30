@@ -19,13 +19,17 @@ import (
 func main() {
 	go startGorillaMux()
 	log.WriteLog("Back End Application started...")
-	Execute()
+	defer Execute()
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	cronJob := cron.New()
 	cronJob.Start()
-	cronJob.AddFunc("@every 5m", Execute) //Wait 5 minutes and Execute
+	cronJob.AddFunc("@every 5m", CallExecute) //Wait 5 minutes and Execute
 	wg.Wait()
+}
+
+func CallExecute(){
+	defer Execute()
 }
 
 func startGorillaMux(){	
