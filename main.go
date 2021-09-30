@@ -15,45 +15,45 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/robfig/cron"
 )
-
+var c *helper.Config
 func main() {
-	go startGorillaMux()
-	log.WriteLog("Back End Application started...")
-	defer Execute()
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-	cronJob := cron.New()
-	cronJob.Start()
-	cronJob.AddFunc("@every 5m", CallExecute) //Wait 5 minutes and Execute
-	wg.Wait()
-}
-
-func CallExecute(){
-	defer Execute()
-}
-
-func startGorillaMux(){	
 	c, err := helper.LoadFromConfigFile();if err != nil {
 		l.Fatal(err)
 	}else{
-		repo, err := repository.New(util.DriveSqlite3DB, c.PathSqliteDB);if err != nil {
+		go startGorillaMux(c)
+		log.WriteLog("Back End Application started...")
+		Execute(c)
+		wg := &sync.WaitGroup{}
+		wg.Add(1)
+		cronJob := cron.New()
+		cronJob.Start()
+		cronJob.AddFunc("@every 5m", CallExecute) //Wait 5 minutes and Execute
+		wg.Wait()
+	}
+}
+
+func CallExecute()  {
+	Execute(c)
+}
+
+func startGorillaMux(c *helper.Config){	
+	repo, err := repository.New(util.DriveSqlite3DB, c.PathSqliteDB);if err != nil {
+		log.WriteLog(err.Error());if err != nil {
+			fmt.Println("Error to write log: "+err.Error())
+		}
+	}else{		
+		err := repo.CreateTable("weather"); if err != nil {			
 			log.WriteLog(err.Error());if err != nil {
 				fmt.Println("Error to write log: "+err.Error())
 			}
-		}else{		
-			err := repo.CreateTable("weather"); if err != nil {			
-				log.WriteLog(err.Error());if err != nil {
-					fmt.Println("Error to write log: "+err.Error())
-				}
+		}else{
+			controllers := controller.New(repo)
+			r, err := usecase.Initialize(controllers, c); if err != nil {
+				log.WriteLog(err.Error())
 			}else{
-				controllers := controller.New(repo)
-				r, err := usecase.Initialize(controllers); if err != nil {
+				err := http.ListenAndServe(c.APIHost + c.APIPort, r);if err != nil {
 					log.WriteLog(err.Error())
-				}else{
-					err := http.ListenAndServe(c.APIHost + c.APIPort, r);if err != nil {
-						log.WriteLog(err.Error())
-						l.Fatal(err)
-					}
+					l.Fatal(err)
 				}
 			}
 		}
@@ -61,34 +61,31 @@ func startGorillaMux(){
 }
 
 // Execute this function to insert weather into database
-func Execute()  {
-	c, err := helper.LoadFromConfigFile();if err != nil {
-		l.Fatal(err)
-	}else{
-		repo, err := repository.New(util.DriveSqlite3DB, c.PathSqliteDB);if err != nil {
+func Execute(c *helper.Config)  {
+	
+	repo, err := repository.New(util.DriveSqlite3DB, c.PathSqliteDB);if err != nil {
+		log.WriteLog(err.Error());if err != nil {
+			fmt.Println("Error to write log: "+err.Error())
+		}
+	}else{	
+		w, err := usecase.GetDataFromIoT(c);if err != nil {
 			log.WriteLog(err.Error());if err != nil {
 				fmt.Println("Error to write log: "+err.Error())
 			}
-		}else{	
-			w, err := usecase.GetDataFromIoT();if err != nil {
-				log.WriteLog(err.Error());if err != nil {
+		}else{
+			controllers := controller.New(repo)
+			if ((w.TempC < -50) || (w.TempC == 23.39 && w.TempF == 74.1 && w.Hum == 30.03 && w.Pres == 618.94 )){
+				log.WriteLog(fmt.Sprintf("Invalid data values: TempC = %.2f TempF = %.2f Hum = %.2f Pres = %.2f Alt = %2f Hi = %2f DewPoint = %2f",w.TempC, w.TempF, w.Hum, w.Pres, w.Alt, w.Hi, w.DewPoint));if err != nil {
 					fmt.Println("Error to write log: "+err.Error())
-				}
+				}			
 			}else{
-				controllers := controller.New(repo)
-				if ((w.TempC < -50) || (w.TempC == 23.39 && w.TempF == 74.1 && w.Hum == 30.03 && w.Pres == 618.94 )){
-					log.WriteLog(fmt.Sprintf("Invalid data values: TempC = %.2f TempF = %.2f Hum = %.2f Pres = %.2f Alt = %2f Hi = %2f DewPoint = %2f",w.TempC, w.TempF, w.Hum, w.Pres, w.Alt, w.Hi, w.DewPoint));if err != nil {
+				err := controllers.Weather.Insert(w);if err != nil {
+					log.WriteLog(err.Error());if err != nil {
 						fmt.Println("Error to write log: "+err.Error())
-					}			
-				}else{
-					err := controllers.Weather.Insert(w);if err != nil {
-						log.WriteLog(err.Error());if err != nil {
-							fmt.Println("Error to write log: "+err.Error())
-						}
 					}
 				}
-				
 			}
+			
 		}
 	}
 }

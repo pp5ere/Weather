@@ -18,10 +18,7 @@ func (a *API) endPoints()  {
 }
 
 //Initialize the route
-func Initialize(w *controller.Controllers) (*mux.Router, error) {
-	c, err := helper.LoadFromConfigFile();if err != nil {
-		return nil, err
-	}
+func Initialize(w *controller.Controllers,c *helper.Config) (*mux.Router, error) {
 	thisRoute := mux.NewRouter()
 	thisAPI := &API{Router: thisRoute,Weather: w.Weather, ReactAppFolder: c.ReactAppFolder}
 	thisAPI.endPoints()	

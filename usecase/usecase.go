@@ -12,11 +12,8 @@ import (
 )
 
 //GetDataFromIoT get weather data from IoT webservice
-func GetDataFromIoT() (*entity.Weather, error) {
+func GetDataFromIoT(c * helper.Config) (*entity.Weather, error) {
 	var weather entity.Weather
-	c, err := helper.LoadFromConfigFile();if err != nil {
-		return nil, err
-	}
 	client := &http.Client{
 		Timeout : 20 * time.Second,
 	}
