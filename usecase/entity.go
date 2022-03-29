@@ -3,6 +3,8 @@ package usecase
 import (
 	"Weather/controller"
 	"Weather/entity"
+	"Weather/helper"
+
 	"github.com/gorilla/mux"
 )
 
@@ -10,7 +12,7 @@ import (
 type API struct{
 	Router *mux.Router
 	Weather controller.WeatherController
-	ReactAppFolder string
+	ConfigFile *helper.Config
 }
 
 //ResultWeather show error json when its happening

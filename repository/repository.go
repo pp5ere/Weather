@@ -3,6 +3,7 @@ package repository
 import (
 	"Weather/entity"
 	"Weather/repository/log"
+	"fmt"
 	"strconv"
 	"time"
 )
@@ -17,6 +18,7 @@ type Weather interface{
 
 //Insert add a new weather into db
 func (c *SqliteDB) Insert(w *entity.Weather) error {
+	
 	connection := c.connection
 	res, err := connection.Exec(`insert into weather(data, tempc, tempf, hum, pres, alt, hi, dewpoint) values(?,?,?,?,?,?,?,?)`, time.Now(),w.TempC,w.TempF,w.Hum,w.Pres,w.Alt,w.Hi, w.DewPoint);if err != nil {
 		return err
@@ -24,12 +26,14 @@ func (c *SqliteDB) Insert(w *entity.Weather) error {
 	id, err := res.LastInsertId();if err != nil {
 		return err
 	}
+	
 	return insertLog(id, w)
 }
 
 //FindAll returns all Weather from database order by ID
 func (c *SqliteDB) FindAll() ([]*entity.Weather, error) {
 	var weathers []*entity.Weather
+	
 	connection := c.connection
 	rows, err := connection.Query("SELECT * FROM weather order by id"); if err != nil {
 		return nil, err
@@ -41,29 +45,52 @@ func (c *SqliteDB) FindAll() ([]*entity.Weather, error) {
 		weathers = append(weathers, &w) 
 	}
 	defer rows.Close()
+	
 	return weathers, err
 
 }
 
 //FindByDate returns all weather from a specific date
 func (c *SqliteDB) FindByDate(d time.Time) ([]*entity.Weather, error){
+	init := time.Now()
 	var weathers []*entity.Weather
+
 	connection := c.connection
 	rows, err := connection.Query("SELECT * FROM weather where date(data, 'localtime') = date(?) order by data asc", d); if err != nil {
 		return nil, err
 	}
-	for rows.Next(){
-		var w entity.Weather
-		err = rows.Scan(&w.ID, &w.Data, &w.TempC, &w.TempF, &w.Hum, &w.Pres, &w.Alt, &w.Hi, &w.DewPoint)
-		weathers = append(weathers, &w)
-	}
+	//ch := make(chan entity.Weather)
+	end := make(chan bool)	
+	go func ()  {
+		for rows.Next(){
+			var w entity.Weather
+			err = rows.Scan(&w.ID, &w.Data, &w.TempC, &w.TempF, &w.Hum, &w.Pres, &w.Alt, &w.Hi, &w.DewPoint)
+			//ch <- w
+			weathers = append(weathers, &w)
+		}
+		end <-true
+	}()		
+	
+	/*go func () {			
+		for w := range ch {
+			nw := w
+			weathers = append(weathers, &nw)
+		}
+		
+	}()*/
+	
 	defer rows.Close()
+	<-end
+	fin := time.Now().Sub(init)
+	fmt.Println(fin)
+	
 	return weathers, err
 }
 
 //FindMaxMinTempCPerDay returns all max temperature per day
 func (c *SqliteDB) FindMaxMinTempCPerDay(d time.Time) ([]*entity.WeatherMaxMin, error){
 	var weathers []*entity.WeatherMaxMin
+	
 	connection := c.connection
 	rows, err := connection.Query(`select w.data data, min(w.tempC) minTempC, max(w.tempC) maxTempC
 									from weather w
@@ -79,6 +106,7 @@ func (c *SqliteDB) FindMaxMinTempCPerDay(d time.Time) ([]*entity.WeatherMaxMin, 
 		weathers = append(weathers, &w)
 	}
 	defer rows.Close()
+	
 	return weathers, err
 }
 
@@ -98,6 +126,7 @@ func insertLog(id int64, w *entity.Weather) error {
 //CreateTable create table weather if it not exist
 func (c *SqliteDB) CreateTable(dbName string) error {
 	var exist bool
+	
 	connection := c.connection
 	err := connection.QueryRow(`SELECT EXISTS (SELECT * FROM sqlite_master WHERE tbl_name = ?)as exist`, dbName).Scan(&exist); if err != nil {
 		log.WriteLog(err.Error())

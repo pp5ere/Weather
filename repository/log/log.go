@@ -1,27 +1,32 @@
 package log
 
 import (
-	"Weather/helper"
+	"Weather/middlewares/util"
+	"fmt"
 	"log"
+	"os"
 	"time"
 )
 
 //WriteLog saves messagens into the log.txt
-func WriteLog(msg string) error {
-	c, err := helper.LoadFromConfigFile();if err != nil {
-		log.Fatal(err)	
+func WriteLog(msg string) error {	
+	dirLog := util.RootDir + "log/"
+	if _, err := os.Stat(dirLog); os.IsNotExist(err) {
+		err := os.MkdirAll(dirLog, 0755);if err != nil {
+			return err
+		}
 	}
-	fileName := c.PathLog
-	file, err := helper.LoadFile(fileName); if err != nil {
+	file, err := os.OpenFile(dirLog+getNameLog(), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666);if err != nil {		
 		return err
-	}
+	}	
+	log.SetOutput(file)
+	log.Println(msg)
 	defer file.Close()
-	t := time.Now()
-	//tf := fmt.Sprintf("%d-%02d-%02d %02d:%02d:%02d", t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second())
-	tf := t.Format("2006-01-02 15:04:05")
-	msg = tf + " | " + msg + "\n"
-	_, err = file.WriteString(msg);if err != nil {
-		return err
-	}
+	
 	return err
+}
+
+func getNameLog() string {
+	y, m, d := time.Now().Date()	
+	return fmt.Sprint(y)+"-"+fmt.Sprint(int(m))+"-"+fmt.Sprint(d)+".log"
 }

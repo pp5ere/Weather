@@ -59,7 +59,7 @@ func (a *API) findMaxMinTempCPerDay(w http.ResponseWriter, r *http.Request){
 
 func (a *API) findDataFromIoT(w http.ResponseWriter, r *http.Request){
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	weather, _ := GetDataFromIoT()
+	weather, _ := GetDataFromIoT(a.ConfigFile)
 	weather.Data = time.Now()
 	err := json.NewEncoder(w).Encode(weather);	if err != nil {
 		log.WriteLog(err.Error())

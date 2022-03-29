@@ -14,9 +14,8 @@ import (
 //GetDataFromIoT get weather data from IoT webservice
 func GetDataFromIoT(c * helper.Config) (*entity.Weather, error) {
 	var weather entity.Weather
-	client := &http.Client{
-		Timeout : 20 * time.Second,
-	}
+	client := http.DefaultClient;
+    client.Timeout = 10 * time.Second
 	req, err := http.NewRequest("GET", c.URLFromIoTWebService, nil); if err != nil {
 		return nil, err
 	}
@@ -24,16 +23,19 @@ func GetDataFromIoT(c * helper.Config) (*entity.Weather, error) {
 	resp, err := client.Do(req); if err != nil {
 		return nil, err
 	}
+	req.Close = true
 	var buf bytes.Buffer
 	if _, err := io.Copy(&buf, resp.Body); err != nil {
 		return nil, err
 	}
 	err = json.Unmarshal(buf.Bytes(), &weather);if err != nil {
-		return nil, err
+		return nil, err		
 	}
+	defer resp.Body.Close()
+	
 	weather.Hi = util.FahrenheitToCelsius(util.CalculateHeatIndex(weather.TempF, weather.Hum))
 	weather.DewPoint = util.DewPoint(weather.TempC,weather.Hum)
-	defer resp.Body.Close()
+	
 	return &weather,nil
 }
 
