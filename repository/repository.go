@@ -54,60 +54,59 @@ func (c *SqliteDB) FindAll() ([]*entity.Weather, error) {
 func (c *SqliteDB) FindByDate(d time.Time) ([]*entity.Weather, error){
 	init := time.Now()
 	var weathers []*entity.Weather
-
 	connection := c.connection
-	rows, err := connection.Query("SELECT * FROM weather where date(data, 'localtime') = date(?) order by data asc", d); if err != nil {
+	query := "SELECT * FROM weather where data like '"+d.Format("2006-01-02")+"%' order by data asc"
+	stmt, err := connection.Prepare(query);if err != nil {
 		return nil, err
 	}
-	//ch := make(chan entity.Weather)
-	end := make(chan bool)	
-	go func ()  {
-		for rows.Next(){
-			var w entity.Weather
-			err = rows.Scan(&w.ID, &w.Data, &w.TempC, &w.TempF, &w.Hum, &w.Pres, &w.Alt, &w.Hi, &w.DewPoint)
-			//ch <- w
-			weathers = append(weathers, &w)
+	defer stmt.Close()
+	rows, err := stmt.Query() /*connection.Query(query)*/; if err != nil {
+		return nil, err
+	}
+	for rows.Next(){
+		var w entity.Weather
+		err := rows.Scan(&w.ID, &w.Data, &w.TempC, &w.TempF, &w.Hum, &w.Pres, &w.Alt, &w.Hi, &w.DewPoint); if err != nil {
+			return nil, err
 		}
-		end <-true
-	}()		
-	
-	/*go func () {			
-		for w := range ch {
-			nw := w
-			weathers = append(weathers, &nw)
-		}
-		
-	}()*/
-	
+		weathers = append(weathers, &w)
+	}
 	defer rows.Close()
-	<-end
 	fin := time.Now().Sub(init)
-	fmt.Println(fin)
+	fmt.Println("Time to execute FindByDate",fin)
 	
-	return weathers, err
+	return weathers, nil
 }
 
 //FindMaxMinTempCPerDay returns all max temperature per day
 func (c *SqliteDB) FindMaxMinTempCPerDay(d time.Time) ([]*entity.WeatherMaxMin, error){
+	init := time.Now()
 	var weathers []*entity.WeatherMaxMin
-	
-	connection := c.connection
+	lastYear, err := strconv.Atoi(d.AddDate(-1,0,0).Format("20060102")); if err != nil {
+		return nil, err
+	}
+	today, err := strconv.Atoi(d.Format("20060102")); if err != nil {
+		return nil, err
+	}
+	connection := c.connection	
 	rows, err := connection.Query(`select w.data data, min(w.tempC) minTempC, max(w.tempC) maxTempC
 									from weather w
-									where date(data, 'localtime') >= date(?) and
-									date(data, 'localtime') <= date(?)
-									group by date(w.data, 'localtime')`, d.AddDate(-1,0,0), d); 
+									where CAST(strftime('%Y%m%d', w.data) AS int) >= ? and 
+									CAST(strftime('%Y%m%d', w.data) AS int) <= ?
+									group by date(w.data, 'localtime')`, lastYear, today );
 	if err != nil {
 		return nil, err
 	}
 	for rows.Next(){
 		var w entity.WeatherMaxMin
-		err = rows.Scan(&w.Data, &w.MinTempC, &w.MaxTempC)
+		err = rows.Scan(&w.Data, &w.MinTempC, &w.MaxTempC);if err != nil {
+			return nil, err
+		}
 		weathers = append(weathers, &w)
 	}
 	defer rows.Close()
-	
-	return weathers, err
+	fin := time.Now().Sub(init)
+	fmt.Println("Time to execute FindMaxMinTempPerDay",fin)
+	return weathers, nil
 }
 
 func insertLog(id int64, w *entity.Weather) error {
