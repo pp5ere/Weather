@@ -1,29 +1,43 @@
 import React, { Component } from 'react'  
 import * as am4core from "@amcharts/amcharts4/core";  
 import * as am4charts from "@amcharts/amcharts4/charts";  
+import { /*getWeatherByDate,*/ getMaxMinTempCPerDay} from '../API/weather'
 //import am4themes_animated from "@amcharts/amcharts4/themes/animated";  
 import am4lang_pt_BR from "@amcharts/amcharts4/lang/pt_BR";
+import { getDataFromSensor } from '../API/weather';
   
 //am4core.useTheme(am4themes_animated);
 
 class ChartMaxMin extends Component {  
-  
-    componentDidMount() {  
-        this.Chart(this.props.weather, "C°");
-    }  
+    constructor (props){
+        super(props);
+        this.state = {
+            date: this.props.date,
+            minmax:[],
+        };        
+    }    
+    componentDidMount() {
+        this.getData()
+        this.Chart("C°");
+    }
+
+    async getData(){
+        this.setState({date: this.props.date, minmax: await getMaxMinTempCPerDay(this.props.date)});
+        this.chart.data = this.state.minmax;
+    }
 
     componentDidUpdate(oldProps){
-        if (oldProps.weather !== this.props.weather){
-            this.chart.data = this.props.weather;
+        if (oldProps.date !== this.props.date){
+            this.getData();
         }
     }
 
-    Chart(weather, unit){
+    Chart(unit){
         let chart = am4core.create("MaxMinChart", am4charts.XYChart);  
         chart.language.locale = am4lang_pt_BR;
         
         // Add data  
-        chart.data = weather;
+        chart.data = this.state.minmax;
         let dateAxis = chart.xAxes.push(new am4charts.DateAxis());
         
         dateAxis.tooltipDateFormat = "d MMMM YYYY";

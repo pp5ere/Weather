@@ -3,7 +3,7 @@ import ChartTemperature from './ChartTemperature';
 import ChartHum from './ChartHum';
 import ChartPres from './ChartPres';
 import ChartMaxMin from './ChartMaxMin';
-import { getWeatherByDate, getMaxMinTempCPerDay} from '../API/weather'
+import { getWeatherByDate } from '../API/weather'
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import GaugesContainer from './GaugeContainer';
@@ -14,7 +14,6 @@ export default class ChartContainer extends Component{
         this.state = {
             date: new Date(),
             weather: [],
-            minmax:[],
         };
     }
     
@@ -28,7 +27,7 @@ export default class ChartContainer extends Component{
     }
 
     async getWeather(d){
-        this.setState({date: d, weather: await getWeatherByDate(d), minmax: await getMaxMinTempCPerDay(d)});
+        this.setState({date: d, weather: await getWeatherByDate(d)});
     }
 
     startTimer(){
@@ -89,7 +88,7 @@ export default class ChartContainer extends Component{
                             <ChartHum weather={this.state.weather}/>
                             <ChartPres weather={this.state.weather}/>
                         </div>
-                        <ChartMaxMin weather={this.state.minmax}/>
+                        <ChartMaxMin date={this.state.date}/>
                     </div>
                        
                 </div>
