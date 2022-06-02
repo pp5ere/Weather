@@ -3,7 +3,7 @@ package usecase
 import (
 	"Weather/entity"
 	"Weather/helper"
-	"Weather/middlewares/util"
+	//"Weather/middlewares/util"
 	"bytes"
 	"encoding/json"
 	"io"
@@ -33,8 +33,8 @@ func GetDataFromIoT(c * helper.Config) (*entity.Weather, error) {
 	}
 	defer resp.Body.Close()
 	
-	weather.Hi = util.FahrenheitToCelsius(util.CalculateHeatIndex(weather.TempF, weather.Hum))
-	weather.DewPoint = util.DewPoint(weather.TempC,weather.Hum)
+	/*weather.Hi = util.FahrenheitToCelsius(util.CalculateHeatIndex(weather.TempF, weather.Hum))
+	weather.DewPoint = util.DewPoint(weather.TempC,weather.Hum)*/
 	
 	return &weather,nil
 }
