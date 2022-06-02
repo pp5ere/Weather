@@ -3,6 +3,7 @@
 # dependencies
 /logfile
 /data
+/log
 /frontend/weather/node_modules
 /.pnp
 .pnp.js
