@@ -88,7 +88,7 @@ func (c *SqliteDB) FindMaxMinTempCPerDay(d time.Time) ([]*entity.WeatherMaxMin, 
 		return nil, err
 	}
 	connection := c.connection	
-	rows, err := connection.Query(`select w.data data, min(w.tempC) minTempC, max(w.tempC) maxTempC
+	rows, err := connection.Query(`select w.data, min(w.tempC) minTempC, max(w.tempC) maxTempC
 									from weather w
 									where w.id >= (
 										select id from weather where CAST(strftime('%Y%m%d', data) AS int) >= ? ORDER by id asc LIMIT 1 
